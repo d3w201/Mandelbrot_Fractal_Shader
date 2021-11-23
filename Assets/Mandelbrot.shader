@@ -4,7 +4,10 @@ Shader "Explorer/NewImageEffectShader"
     {
         _MainTex ("Texture", 2D) = "white" {}
         _Area("Area", vector) = (0,0,4,4)
+        _MaxIter("Iterations", range(4,1000)) = 255
         _Angle("Angle", range(-3.1415,3.1415)) = 0
+        _Color("Color", range(0,1)) = .5
+        _Repeat("Repeat",float) = 1
     }
     SubShader
     {
@@ -19,6 +22,10 @@ Shader "Explorer/NewImageEffectShader"
 
             #include "UnityCG.cginc"
 
+            float4 _Area;
+            float _Angle, _MaxIter, _Color, _Repeat;
+            sampler2D _MainTex;
+
             struct appdata
             {
                 float4 vertex : POSITION;
@@ -31,7 +38,7 @@ Shader "Explorer/NewImageEffectShader"
                 float4 vertex : SV_POSITION;
             };
 
-            v2f vert (appdata v)
+            v2f vert(appdata v)
             {
                 v2f o;
                 o.vertex = UnityObjectToClipPos(v.vertex);
@@ -39,33 +46,34 @@ Shader "Explorer/NewImageEffectShader"
                 return o;
             }
 
-            float4 _Area;
-            float _Angle;
-            sampler2D _MainTex;
-
-            float2 rot(float2 p, float2 pivot,float a)
+            float2 rot(float2 p, float2 pivot, float a)
             {
                 float s = sin(a);
                 float c = cos(a);
                 p -= pivot;
-                p = float2(p.x*c-p.y*s,p.x*s+p.y*c);
-                p+=pivot;
+                p = float2(p.x * c - p.y * s, p.x * s + p.y * c);
+                p += pivot;
                 return p;
             }
-            
 
-            fixed4 frag (v2f i) : SV_Target
+
+            fixed4 frag(v2f i) : SV_Target
             {
-                float2 c = _Area.xy + (i.uv-.5)*_Area.zw;
-                c = rot(c,_Area.xy, _Angle);
+                float2 c = _Area.xy + (i.uv - .5) * _Area.zw;
+                c = rot(c, _Area.xy, _Angle);
+
                 float2 z;
                 float iter;
-                for(iter = 0; iter < 255; iter++)
+                for (iter = 0; iter < _MaxIter; iter++)
                 {
-                    z = float2(z.x*z.x-z.y*z.y,2*z.x*z.y) + c;
-                    if(length(z)>2)break;
+                    z = float2(z.x * z.x - z.y * z.y, 2 * z.x * z.y) + c;
+                    if (length(z) > 2)break;
                 }
-                return iter /255;
+                //if(iter>_MaxIter) return 0;
+                float m = sqrt(iter / _MaxIter);
+                float4 col = sin(float4(.3, .45, .65, 1) * m * 20) * .5 + 5;
+                col = tex2D(_MainTex, float2(m*_Repeat, _Color));
+                return col;
             }
             ENDCG
         }
