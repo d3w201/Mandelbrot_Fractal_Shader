@@ -8,6 +8,7 @@ Shader "Explorer/NewImageEffectShader"
         _Angle("Angle", range(-3.1415,3.1415)) = 0
         _Color("Color", range(0,1)) = .5
         _Repeat("Repeat",float) = 1
+        _Speed("Speed",float) =1
     }
     SubShader
     {
@@ -23,7 +24,7 @@ Shader "Explorer/NewImageEffectShader"
             #include "UnityCG.cginc"
 
             float4 _Area;
-            float _Angle, _MaxIter, _Color, _Repeat;
+            float _Angle, _MaxIter, _Color, _Repeat, _Speed;
             sampler2D _MainTex;
 
             struct appdata
@@ -62,17 +63,28 @@ Shader "Explorer/NewImageEffectShader"
                 float2 c = _Area.xy + (i.uv - .5) * _Area.zw;
                 c = rot(c, _Area.xy, _Angle);
 
-                float2 z;
+                float r = 20; //escape radius
+                float r2 = r * r;
+
+                float2 z, zPrevious;
                 float iter;
                 for (iter = 0; iter < _MaxIter; iter++)
                 {
+                    //zPrevious = z;
                     z = float2(z.x * z.x - z.y * z.y, 2 * z.x * z.y) + c;
-                    if (length(z) > 2)break;
+                    if (dot(z, z) > r2)break;
                 }
-                //if(iter>_MaxIter) return 0;
+                if (iter > _MaxIter) return 0;
+
+                float dist = length(z); //distance from origin
+                float fracIter = (dist - r) / (r2 - r); //linear interpolation
+                fracIter = log2(log(dist) / log(r)); //double exponential interpolation
+
+                iter -= fracIter;
+
                 float m = sqrt(iter / _MaxIter);
                 float4 col = sin(float4(.3, .45, .65, 1) * m * 20) * .5 + 5;
-                col = tex2D(_MainTex, float2(m*_Repeat, _Color));
+                col = tex2D(_MainTex, float2(m * _Repeat + _Time.y * _Speed, _Color));
                 return col;
             }
             ENDCG
