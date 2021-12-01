@@ -70,21 +70,23 @@ Shader "Explorer/NewImageEffectShader"
                 float iter;
                 for (iter = 0; iter < _MaxIter; iter++)
                 {
-                    //zPrevious = z;
+                    zPrevious = z;
                     z = float2(z.x * z.x - z.y * z.y, 2 * z.x * z.y) + c;
-                    if (dot(z, z) > r2)break;
+                    
+                    if (dot(z, zPrevious) > r2)break;
                 }
                 if (iter > _MaxIter) return 0;
 
                 float dist = length(z); //distance from origin
                 float fracIter = (dist - r) / (r2 - r); //linear interpolation
-                fracIter = log2(log(dist) / log(r)); //double exponential interpolation
-
-                iter -= fracIter;
-
+                fracIter = log2(log(dist) / log(r)); //double exponential interpolation               
+                
                 float m = sqrt(iter / _MaxIter);
                 float4 col = sin(float4(.3, .45, .65, 1) * m * 20) * .5 + 5;
                 col = tex2D(_MainTex, float2(m * _Repeat + _Time.y * _Speed, _Color));
+
+                col*=smoothstep(3,0,fracIter);
+                
                 return col;
             }
             ENDCG
