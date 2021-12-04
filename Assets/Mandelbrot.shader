@@ -60,7 +60,10 @@ Shader "Explorer/NewImageEffectShader"
 
             fixed4 frag(v2f i) : SV_Target
             {
-                float2 c = _Area.xy + (i.uv - .5) * _Area.zw;
+                float2 uv = i.uv - .5;
+                uv = abs(uv);
+
+                float2 c = _Area.xy + uv * _Area.zw;
                 c = rot(c, _Area.xy, _Angle);
 
                 float r = 20; //escape radius
@@ -70,9 +73,9 @@ Shader "Explorer/NewImageEffectShader"
                 float iter;
                 for (iter = 0; iter < _MaxIter; iter++)
                 {
-                    zPrevious = rot(z,0, _Time.y);
+                    zPrevious = rot(z, 0, _Time.y);
                     z = float2(z.x * z.x - z.y * z.y, 2 * z.x * z.y) + c;
-                    
+
                     if (dot(z, zPrevious) > r2)break;
                 }
                 if (iter > _MaxIter) return 0;
@@ -80,15 +83,15 @@ Shader "Explorer/NewImageEffectShader"
                 float dist = length(z); //distance from origin
                 float fracIter = (dist - r) / (r2 - r); //linear interpolation
                 fracIter = log2(log(dist) / log(r)); //double exponential interpolation               
-                
+
                 float m = sqrt(iter / _MaxIter);
                 float4 col = sin(float4(.3, .45, .65, 1) * m * 20) * .5 + 5;
                 col = tex2D(_MainTex, float2(m * _Repeat + _Time.y * _Speed, _Color));
 
-                float angle = atan2(z.x,z.y);
-                col*=smoothstep(3,0,fracIter);
+                float angle = atan2(z.x, z.y);
+                col *= smoothstep(3, 0, fracIter);
 
-                col*=1+sin(angle*2)*.2;                
+                col *= 1 + sin(angle * 2 + _Time.y * 4) * .2;
                 return col;
             }
             ENDCG
