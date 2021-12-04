@@ -70,7 +70,7 @@ Shader "Explorer/NewImageEffectShader"
                 float iter;
                 for (iter = 0; iter < _MaxIter; iter++)
                 {
-                    zPrevious = z;
+                    zPrevious = rot(z,0, _Time.y);
                     z = float2(z.x * z.x - z.y * z.y, 2 * z.x * z.y) + c;
                     
                     if (dot(z, zPrevious) > r2)break;
@@ -85,8 +85,10 @@ Shader "Explorer/NewImageEffectShader"
                 float4 col = sin(float4(.3, .45, .65, 1) * m * 20) * .5 + 5;
                 col = tex2D(_MainTex, float2(m * _Repeat + _Time.y * _Speed, _Color));
 
+                float angle = atan2(z.x,z.y);
                 col*=smoothstep(3,0,fracIter);
-                
+
+                col*=1+sin(angle*2)*.2;                
                 return col;
             }
             ENDCG
