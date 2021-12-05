@@ -9,6 +9,7 @@ Shader "Explorer/NewImageEffectShader"
         _Color("Color", range(0,1)) = .5
         _Repeat("Repeat",float) = 1
         _Speed("Speed",float) =1
+        _Symmetry("Symmetry",range(-1,1)) =1
     }
     SubShader
     {
@@ -24,7 +25,7 @@ Shader "Explorer/NewImageEffectShader"
             #include "UnityCG.cginc"
 
             float4 _Area;
-            float _Angle, _MaxIter, _Color, _Repeat, _Speed;
+            float _Angle, _MaxIter, _Color, _Repeat, _Speed,_Symmetry;
             sampler2D _MainTex;
 
             struct appdata
@@ -62,7 +63,11 @@ Shader "Explorer/NewImageEffectShader"
             {
                 float2 uv = i.uv - .5;
                 uv = abs(uv);
+                uv = rot(uv,0,.25*3.1415);
+                uv = abs(uv);
 
+                uv = lerp(i.uv-.5,uv,_Symmetry);
+                
                 float2 c = _Area.xy + uv * _Area.zw;
                 c = rot(c, _Area.xy, _Angle);
 
