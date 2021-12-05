@@ -56,7 +56,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - _Angle: 6.0200353
+    - _Angle: 11.600185
     - _BumpScale: 1
     - _Color: 0.789
     - _Cutoff: 0.5
@@ -65,20 +65,21 @@ Material:
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
-    - _MaxIter: 802
+    - _MaxIter: 1000
     - _Metallic: 0
     - _Mode: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.02
-    - _Repeat: 7.5
+    - _Repeat: 51.61
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
-    - _Speed: -0.66
+    - _Speed: -0.2
     - _SrcBlend: 1
+    - _Symmetry: 1
     - _UVSec: 0
     - _ZWrite: 1
     m_Colors:
-    - _Area: {r: -1.29653, g: 0.072481096, b: 0.0101223625, a: 0.004781762}
+    - _Area: {r: 0.23306082, g: 0.5414913, b: 0.013050401, a: 0.0073408503}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
   m_BuildTextureStacks: []

@@ -38,9 +38,9 @@ public class Explorer : MonoBehaviour
     private void HandleInputs()
     {
         //zoom
-        if (Input.GetKey(KeyCode.KeypadPlus))
+        if (Input.GetKey(KeyCode.I))
             scale *= .99f;
-        if (Input.GetKey(KeyCode.KeypadMinus))
+        if (Input.GetKey(KeyCode.O))
             scale += 1.01f;
         
         //rotation
@@ -49,7 +49,7 @@ public class Explorer : MonoBehaviour
         if (Input.GetKey(KeyCode.Q))
             angle += .01f;
 
-        Vector2 dir = new Vector2(.01f * scale, 0);
+        Vector2 dir = new Vector2(.001f * scale, 0);
         float s = Mathf.Sin(angle);
         float c = Mathf.Cos(angle);
         dir = new Vector2(dir.x * c, dir.x * s);
